@@ -17,7 +17,7 @@ namespace FBStoreA
 
 	void App::OnStartup(StartupEventArgs^ e)
 	{
-		FileStream^ fs = gcnew FileStream(L"App.xaml", FileMode::Open);
+		FileStream^ fs = gcnew FileStream("App.xaml", FileMode::Open);
 		Resources = (ResourceDictionary^)XamlReader::Load(fs);
 		fs->Close();
 

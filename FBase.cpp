@@ -10,91 +10,110 @@
 
 using namespace firebase;
 using namespace firebase::auth;
+using namespace std;
 
 namespace FBStoreA
 {
-	bool FBase::LoginAnon()
+	bool reset_app(App*& _fbApp, Auth*& _fbAuth)
 	{
 		if (_fbApp)
 		{
 			delete _fbApp;
-			std::cout << "Delete Firebase App." << std::endl;
+			cout << "Delete Firebase App." << endl;
 		}
 		_fbApp = App::Create();
 		if (!_fbApp)
 		{
-			std::cout << "Failed to initialize Firebase App." << std::endl;
+			cout << "Failed to initialize Firebase App." << endl;
 			return false;
-		}
-
-		if (_fbAuth)
-		{
-			delete _fbAuth;
-			std::cout << "Delete Firebase Auth." << std::endl;
 		}
 		_fbAuth = Auth::GetAuth(_fbApp);
 		if (!_fbAuth)
 		{
-			std::cout << "Failed to initialize Firebase Auth." << std::endl;
-			return false;
-		}
-
-		Future<AuthResult> future = _fbAuth->SignInAnonymously();
-		while (future.status() == firebase::kFutureStatusPending)
-		{
-			Sleep(100);
-		}
-
-		if (future.status() == firebase::kFutureStatusComplete)
-		{
-			if (future.error() == firebase::auth::kAuthErrorNone)
-			{
-				std::cout << "Anonymous sign-in successful!" << std::endl;
-				const firebase::auth::User user = future.result()->user;
-				if (user.is_valid())
-					std::cout << "User ID: " << user.uid() << std::endl;
-				else {
-					std::cout << "User Invalid error: " << future.error_message() << std::endl;
-					return false;
-				}
-			}
-			else {
-				std::cout << "Error signing in anonymously: " << future.error_message() << std::endl;
-				return false;
-			}
-		}
-		else {
-			std::cout << "Sign-in operation did not complete." << std::endl;
+			cout << "Failed to initialize Firebase Auth." << endl;
 			return false;
 		}
 		return true;
 	}
 
-	FBase::~FBase()
+	bool complete_app(App* _fbApp, Auth* _fbAuth, Future<AuthResult>& future, string& _email, string& _uid)
 	{
-		if (_fbAuth)	
-			_fbAuth->SignOut();		
-		delete _fbApp;
+		while (future.status() == kFutureStatusPending)
+		{
+			Sleep(100);
+		}
+		if (future.status() == kFutureStatusComplete)
+		{
+			if (future.error() == kAuthErrorNone)
+			{
+				const User user = future.result()->user;
+				if (user.is_valid()) {
+					cout << "Sign-in successful!" << endl;
+					cout << "User ID: " << user.uid() << "; Email: " << user.email() << endl;
+					_email = user.email();
+					_uid = user.uid();
+				}
+				else {
+					cout << "User Invalid error: " << future.error_message() << endl;
+					return false;
+				}
+			}
+			else {
+				cout << "Error signing in: " << future.error_message() << endl;
+				return false;
+			}
+		}
+		else {
+			cout << "Sign-in operation did not complete." << endl;
+			return false;
+		}
+		return true;
 	}
-	
+
+	bool FBase::LoginAnon()
+	{
+		if (!reset_app(_fbApp, _fbAuth))
+			return false;
+		Future<AuthResult> future = _fbAuth->SignInAnonymously();
+		return complete_app(_fbApp, _fbAuth, future, _email, _uid);
+	}
+
+	bool FBase::SignupWithEmail(string email, string password)
+	{
+		if (!reset_app(_fbApp, _fbAuth))
+			return false;
+		Future<AuthResult> future = _fbAuth->CreateUserWithEmailAndPassword(email.c_str(), password.c_str());
+		return complete_app(_fbApp, _fbAuth, future, _email, _uid);
+	}
+
+	bool FBase::LoginWithEmail(string email, string password)
+	{
+		if (!reset_app(_fbApp, _fbAuth))
+			return false;
+		Future<AuthResult> future = _fbAuth->SignInWithEmailAndPassword(email.c_str(), password.c_str());
+		return complete_app(_fbApp, _fbAuth, future, _email, _uid);
+	}
+
 	bool FBase::IsLogin()
 	{
-		_userName = "";
 		if (!_fbAuth)
 			return false;
 		const User user = _fbAuth->current_user();
 		if (!user.is_valid())
 			return false;
-		_userName = user.display_name();
+		return true;
 	}
 
 	void FBase::Logout()
 	{
 		if (_fbAuth)
-		{
 			_fbAuth->SignOut();
-			_userName = "";
-		}
+	}
+
+	FBase::~FBase()
+	{
+		Logout();
+		delete _fbApp;
 	}
 }
 

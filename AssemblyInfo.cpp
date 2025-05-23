@@ -4,15 +4,15 @@ using namespace System::Runtime::CompilerServices;
 using namespace System::Runtime::InteropServices;
 using namespace System::Security::Permissions;
 
-[assembly:AssemblyTitleAttribute(L"FBStoreA")];
-[assembly:AssemblyDescriptionAttribute(L"")];
-[assembly:AssemblyConfigurationAttribute(L"")];
-[assembly:AssemblyCompanyAttribute(L"")];
-[assembly:AssemblyProductAttribute(L"FBStoreA")];
-[assembly:AssemblyCopyrightAttribute(L"Copyright (c)  2025")];
-[assembly:AssemblyTrademarkAttribute(L"")];
-[assembly:AssemblyCultureAttribute(L"")];
+[assembly:AssemblyTitleAttribute("FBStoreA")];
+[assembly:AssemblyDescriptionAttribute("")];
+[assembly:AssemblyConfigurationAttribute("")];
+[assembly:AssemblyCompanyAttribute("")];
+[assembly:AssemblyProductAttribute("FBStoreA")];
+[assembly:AssemblyCopyrightAttribute("Copyright (c)  2025")];
+[assembly:AssemblyTrademarkAttribute("")];
+[assembly:AssemblyCultureAttribute("")];
 
-[assembly:AssemblyVersionAttribute(L"1.0.*")];
+[assembly:AssemblyVersionAttribute("1.0.*")];
 
 [assembly:ComVisible(false)];

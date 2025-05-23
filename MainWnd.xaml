@@ -10,7 +10,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="130" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="100" />
         </Grid.ColumnDefinitions>
         <Menu Grid.Column="0">
             <MenuItem Header="_File" x:Name="MenuItem_File">
@@ -21,6 +22,9 @@
         </Menu>
         <Menu Grid.Column="1">
             <MenuItem x:Name="MenuItem_Login" Header="Login" />
+        </Menu>
+        <Menu Grid.Column="2">
+            <MenuItem x:Name="MenuItem_Signup" Header="Signup" />
         </Menu>
     </Grid>
 </Window>

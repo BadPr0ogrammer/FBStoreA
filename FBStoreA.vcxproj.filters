@@ -32,6 +32,9 @@
     <ClInclude Include="FBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LoginDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FBStoreA.cpp">
@@ -49,6 +52,9 @@
     <ClCompile Include="FBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LoginDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="app.ico">
@@ -62,5 +68,13 @@
     <Page Include="MainWnd.xaml">
       <Filter>Resource Files</Filter>
     </Page>
+    <Page Include="LoginDlg.xaml">
+      <Filter>Resource Files</Filter>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="google-services.json">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
