@@ -14,9 +14,6 @@ namespace FBStoreA
 		void OnPropertyChanged(String^ propertyName);
 	public:
 		virtual event PropertyChangedEventHandler^ PropertyChanged;
-		String^ _username = "";
-		String^ _password = "";
-		bool _anonymously = false;
 
 		DependencyObject^ _root = nullptr;
 		MenuItem^ _login_mi = nullptr;

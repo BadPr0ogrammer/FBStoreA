@@ -36,7 +36,42 @@ namespace FBStoreA
 		return true;
 	}
 
-	bool complete_app(App* _fbApp, Auth* _fbAuth, Future<AuthResult>& future, string& _email, string& _uid)
+	bool complete_app(Future<User>& future, string& _user, string& _email)
+	{
+		while (future.status() == kFutureStatusPending)
+		{
+			Sleep(100);
+		}
+		if (future.status() == kFutureStatusComplete)
+		{
+			if (future.error() == kAuthErrorNone)
+			{
+				const User* user = future.result();
+				if (user->is_valid()) {
+					cout << "Sign-in successful!" << endl;
+					cout << "User ID: " << user->uid() << "; Email: " << user->email() << endl;
+					_email = user->email();
+					_user = user->display_name();
+				}
+				else {
+					cout << "User Invalid error: " << future.error_message() << endl;
+					return false;
+				}
+			}
+			else {
+				cout << "Error signing in: " << future.error_message() << endl;
+				return false;
+			}
+		}
+		else {
+			cout << "Sign-in operation did not complete." << endl;
+			return false;
+		}
+		return true;
+	}
+
+
+	bool complete_app_2(Future<AuthResult>& future, string& _user, string& _email)
 	{
 		while (future.status() == kFutureStatusPending)
 		{
@@ -51,7 +86,7 @@ namespace FBStoreA
 					cout << "Sign-in successful!" << endl;
 					cout << "User ID: " << user.uid() << "; Email: " << user.email() << endl;
 					_email = user.email();
-					_uid = user.uid();
+					_user = user.display_name();
 				}
 				else {
 					cout << "User Invalid error: " << future.error_message() << endl;
@@ -75,23 +110,19 @@ namespace FBStoreA
 		if (!reset_app(_fbApp, _fbAuth))
 			return false;
 		Future<AuthResult> future = _fbAuth->SignInAnonymously();
-		return complete_app(_fbApp, _fbAuth, future, _email, _uid);
+		return complete_app_2(future, _user, _email);
 	}
 
-	bool FBase::SignupWithEmail(string email, string password)
+	bool FBase::Login(string id_token, string access_token)
 	{
+		Credential credential = firebase::auth::GoogleAuthProvider::GetCredential(
+			id_token.c_str(),
+			access_token.c_str()
+		);
 		if (!reset_app(_fbApp, _fbAuth))
 			return false;
-		Future<AuthResult> future = _fbAuth->CreateUserWithEmailAndPassword(email.c_str(), password.c_str());
-		return complete_app(_fbApp, _fbAuth, future, _email, _uid);
-	}
-
-	bool FBase::LoginWithEmail(string email, string password)
-	{
-		if (!reset_app(_fbApp, _fbAuth))
-			return false;
-		Future<AuthResult> future = _fbAuth->SignInWithEmailAndPassword(email.c_str(), password.c_str());
-		return complete_app(_fbApp, _fbAuth, future, _email, _uid);
+		Future<User> future = _fbAuth->SignInWithCredential(credential);
+		return complete_app(future, _user, _email);
 	}
 
 	bool FBase::IsLogin()

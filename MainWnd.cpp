@@ -2,7 +2,9 @@
 #include "MainWnd.h"
 #include "LoginDlg.h"
 #include "FBase.h"
+#include "Utilities.h"
 
+using namespace System::Windows;
 using namespace System::Windows::Data;
 using namespace System::IO;
 using namespace System::Text;
@@ -49,15 +51,6 @@ namespace FBStoreA
 	void MainWnd::OnOpenFile(Object^ sender, RoutedEventArgs^ e)
 	{
 	}
-	 
-	std::string ConvertToStdString(System::String^ managedString) 
-	{
-		using namespace System::Runtime::InteropServices;
-		const char* chars = (const char*)(Marshal::StringToHGlobalAnsi(managedString)).ToPointer();
-		std::string nativeString(chars);
-		Marshal::FreeHGlobal(System::IntPtr((void*)chars));
-		return nativeString;
-	} 
 
 	void MainWnd::OnLogin(Object^ sender, RoutedEventArgs^ e)
 	{
@@ -70,24 +63,27 @@ namespace FBStoreA
 		}
 		else
 		{
-			LoginDlg^ loginDlg = gcnew LoginDlg(this);
+			LoginDlg^ loginDlg = gcnew LoginDlg();
 			auto result = loginDlg->ShowDialog();
 			if (result)
 			{
-				if (_anonymously)
+				if (loginDlg->_anon)
 				{
 					if (app->_fbptr->LoginAnon())
 					{
 						PropLogin = "Logout";
 						PropSignup = "<Anon.>";
+						MessageBox::Show("Login Anonymously!", "FBStoreA");
 					}
-				} else {
-					std::string user = ConvertToStdString(_username);
-					std::string pw = ConvertToStdString(_password);
-					if (app->_fbptr->LoginWithEmail(user, pw))
+				} else if (loginDlg->_tokenEndpoint != nullptr) {
+					std::string access_token = ConvertToStdString(loginDlg->_tokenEndpoint["access_token"]);
+					std::string id_token = ConvertToStdString(loginDlg->_tokenEndpoint["id_token"]);
+					if (app->_fbptr->Login(id_token, access_token))
 					{
 						PropLogin = "Logout";
-						PropSignup = gcnew String(user.c_str());
+						PropSignup = gcnew String(app->_fbptr->_user.c_str());
+						std::string msg = "Login " + app->_fbptr->_user + " !";
+						MessageBox::Show(gcnew String(msg.c_str()), "FBStoreA");
 					}
 				}
 			}
@@ -95,7 +91,7 @@ namespace FBStoreA
 	}
 
 	void MainWnd::OnSignup(Object^ sender, RoutedEventArgs^ e)
-	{
+	{/*
 		App^ app = (App^)Application::Current;
 		if (app->_fbptr->IsLogin())
 		{
@@ -112,7 +108,7 @@ namespace FBStoreA
 			std::string pw = ConvertToStdString(_password);
 			if (app->_fbptr->SignupWithEmail(user, pw))
 				propSignup = gcnew String(user.c_str());
-		}
+		}*/
 	}
 
 	void MainWnd::OnClose(Object^ sender, ExecutedRoutedEventArgs^ e) 

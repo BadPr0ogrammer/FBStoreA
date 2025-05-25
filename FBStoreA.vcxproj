@@ -134,7 +134,9 @@
     <ClInclude Include="FBase.h" />
     <ClInclude Include="LoginDlg.h" />
     <ClInclude Include="MainWnd.h" />
+    <ClInclude Include="Project.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -143,11 +145,16 @@
     <ClCompile Include="FBStoreA.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="MainWnd.cpp" />
+    <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="app.ico" />
+    <Image Include="btn_google_sign-in.png" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\oauth-apps-for-windows\OAuthDesktopApp\OAuthDesktopApp\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />

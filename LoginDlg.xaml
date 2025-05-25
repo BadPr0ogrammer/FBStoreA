@@ -1,30 +1,18 @@
 <Window 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Login" Height="200" Width="450" WindowStartupLocation="CenterScreen">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        Title="Login" Height="368" Width="436" WindowStartupLocation="CenterScreen">
+    <StackPanel Margin="10">
+        <Button x:Name="Button_Google" 
+                HorizontalAlignment="Left" VerticalAlignment="Top" 
+                Width="206" Height="46" BorderThickness="0" Padding="0" Background="Transparent">
+            <Image Source="./btn_google_sign-in.png" Stretch="UniformToFill"/>
+        </Button>
+        <Button x:Name="Button_Anon" Content="Anonymously" Margin="8"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Width="190" Height="34" />
 
-        <TextBlock Text="Username:" VerticalAlignment="Center" Margin="12"/>
-        <TextBox x:Name="TextBox_Username" Grid.Column="1" Margin="12"/>
-
-        <TextBlock Text="Password:" VerticalAlignment="Center" Margin="12" Grid.Row="1"/>
-        <TextBox x:Name="PasswordBox_Password" Grid.Column="1" Grid.Row="1" Margin="12"/>
-
-        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12">
-            <Button x:Name="Button_Login" Content="Login" Width="75" Margin="5" />
-            <Button x:Name="Button_Cancel" Content="Cancel" Width="75" Margin="5" />
-        </StackPanel>
-
-        <CheckBox x:Name="CheckBox_Anon" Content="Anonymously" Grid.Column="0" Grid.Row="2" Margin="12" />
-    </Grid>
+        <TextBox x:Name="TextBox_Output" HorizontalAlignment="Left" Height="200" 
+                 TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="400"
+            IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+    </StackPanel>
 </Window>

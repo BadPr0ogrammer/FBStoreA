@@ -18,16 +18,15 @@ namespace FBStoreA
 	public:
 		firebase::App* _fbApp = nullptr;
 		firebase::auth::Auth* _fbAuth = nullptr;
+		std::string _user;
 		std::string _email;
-		std::string _uid;
 
 		FBase() {}
 
 		bool LoginAnon();
 		bool IsLogin();
 		void Logout();
-		bool SignupWithEmail(std::string email, std::string password);
-		bool LoginWithEmail(std::string email, std::string password);
+		bool Login(std::string id_token, std::string access_token);
 
 		~FBase();
 	};
