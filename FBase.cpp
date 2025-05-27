@@ -8,8 +8,12 @@
 #include <chrono>
 #include "firebase/future.h"
 
+#include "firebase/database.h"
+
 using namespace firebase;
 using namespace firebase::auth;
+using namespace firebase::database;
+
 using namespace std;
 
 namespace FBStoreA
@@ -145,6 +149,11 @@ namespace FBStoreA
 	{
 		Logout();
 		delete _fbApp;
+	}
+
+	bool FBase::CreateTestDoc()
+	{
+		return true;
 	}
 }
 

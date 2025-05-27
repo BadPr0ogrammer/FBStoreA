@@ -28,6 +28,8 @@ namespace FBStoreA
 		void Logout();
 		bool Login(std::string id_token, std::string access_token);
 
+		bool CreateTestDoc();
+
 		~FBase();
 	};
 }

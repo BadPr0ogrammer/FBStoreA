@@ -79,14 +79,14 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_DEBUG;SHARED;WIN32;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\firebase_cpp_sdk\include;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;SHARED;FBXSDK_SHARED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <AdditionalIncludeDirectories>..\firebase-cpp-sdk\app\src\include;..\firebase-cpp-sdk\auth\src\include;..\firebase-cpp-sdk\database\src\include;C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>firebase_app.lib;firebase_auth.lib;Advapi32.lib;Ws2_32.lib;Ole32.lib;Crypt32.lib;icu.lib;Shell32.lib</AdditionalDependencies>
+      <AdditionalDependencies>firebase_app.lib;firebase_rest_lib.lib;firebase_auth.lib;firebase_database.lib;flatbuffers.lib;libfbxsdk.lib;libxml2.lib;zlib.lib;Advapi32.lib;Ws2_32.lib;Ole32.lib;Crypt32.lib;icu.lib;Shell32.lib</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>../firebase_cpp_sdk\libs\windows\VS2019\MD\x64\Debug;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Autodesk\FBX\FBX SDK\2020.3.7\lib\x64\debug;C:\Users\andre\firebase-cpp-sdk\build\auth\Debug;C:\Users\andre\firebase-cpp-sdk\build\app\Debug;C:\Users\andre\firebase-cpp-sdk\build\database\Debug;C:\Users\andre\firebase-cpp-sdk\build\app\rest\Debug;C:\Users\andre\firebase-cpp-sdk\build\external\src\flatbuffers-build\Debug</AdditionalLibraryDirectories>
       <AdditionalOptions>/IGNORE:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="FBase.h" />
+    <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="LoginDlg.h" />
     <ClInclude Include="MainWnd.h" />
     <ClInclude Include="Project.h" />
@@ -143,6 +144,7 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="FBase.cpp" />
     <ClCompile Include="FBStoreA.cpp" />
+    <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="Utilities.cpp" />
@@ -152,6 +154,27 @@
     <Image Include="btn_google_sign-in.png" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="CommunityToolkit.Common">
+      <HintPath>..\helix-toolkit\Source\Examples\WPF\SimpleDemo\bin\Debug\net48\CommunityToolkit.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="CommunityToolkit.Diagnostics">
+      <HintPath>..\helix-toolkit\Source\Examples\WPF\SimpleDemo\bin\Debug\net48\CommunityToolkit.Diagnostics.dll</HintPath>
+    </Reference>
+    <Reference Include="CommunityToolkit.Mvvm">
+      <HintPath>..\helix-toolkit\Source\Examples\WPF\SimpleDemo\bin\Debug\net48\CommunityToolkit.Mvvm.dll</HintPath>
+    </Reference>
+    <Reference Include="HelixToolkit">
+      <HintPath>..\helix-toolkit\Source\HelixToolkit\bin\Debug\net48\HelixToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="HelixToolkit.Geometry">
+      <HintPath>..\helix-toolkit\Source\HelixToolkit.Geometry\bin\Debug\net48\HelixToolkit.Geometry.dll</HintPath>
+    </Reference>
+    <Reference Include="HelixToolkit.Maths">
+      <HintPath>..\helix-toolkit\Source\HelixToolkit.Maths\bin\Debug\net48\HelixToolkit.Maths.dll</HintPath>
+    </Reference>
+    <Reference Include="HelixToolkit.Wpf">
+      <HintPath>..\helix-toolkit\Source\HelixToolkit.Wpf\bin\Debug\net48\HelixToolkit.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\oauth-apps-for-windows\OAuthDesktopApp\OAuthDesktopApp\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -160,6 +183,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
