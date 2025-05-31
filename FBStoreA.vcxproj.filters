@@ -44,6 +44,9 @@
     <ClInclude Include="FbxLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ufbx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FBStoreA.cpp">
@@ -68,6 +71,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FbxLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ufbx.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

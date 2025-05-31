@@ -1,5 +1,11 @@
+#ifdef FBXSDK_SHARED
 #include "fbxsdk.h"
+using namespace fbxsdk;
+#else
+#include "ufbx.h"
+#endif
 #include "FbxLoader.h"
+
 #include "App.h"
 #include "MainWnd.h"
 #include "LoginDlg.h"
@@ -14,11 +20,6 @@ using namespace System::Diagnostics;
 using namespace System::Numerics;
 using namespace Microsoft::Win32;
 
-using namespace HelixToolkit;
-using namespace HelixToolkit::Geometry;
-using namespace HelixToolkit::Wpf;
-
-using namespace fbxsdk;
 using namespace std;
 using uchar = unsigned char;
 
@@ -49,9 +50,11 @@ namespace FBStoreA
 		_user_mi->FontSize = 20;
 		_user_mi->Click += gcnew RoutedEventHandler(this, &MainWnd::OnUser);
 
+		_transform_sb_tb = (TextBlock^)tmp->FindName("TextBlock_Transform");
+
 		BindMenuItem(_login_mi, "PropLogin");
 		BindMenuItem(_user_mi, "PropUser");
-
+		
 		CommandBinding^ closeBinding = gcnew CommandBinding(ApplicationCommands::Close);
 		closeBinding->Executed += gcnew ExecutedRoutedEventHandler(this, &MainWnd::OnClose);
 		this->CommandBindings->Add(closeBinding);
@@ -59,8 +62,24 @@ namespace FBStoreA
 		_modelGroup = gcnew Model3DGroup();
 		_modelVisual = gcnew ModelVisual3D();
 
-		HelixViewport3D^ viewport = (HelixViewport3D^)tmp->FindName("Viewport");
-		viewport->Children->Add(_modelVisual);
+		Grid^ grid = (Grid^)tmp->FindName("Grid_Viewport");
+		_viewport = gcnew HelixViewport3D();
+		grid->Children->Add(_viewport);
+
+		_viewport->ShowFrameRate = true;
+		_viewport->ShowCameraInfo = true;
+		_viewport->ShowCoordinateSystem = true;
+		_viewport->ShowTriangleCountInfo = true;
+		_viewport->ZoomExtentsWhenLoaded = false;
+		_viewport->ZoomAroundMouseDownPoint = true;
+		_viewport->RotateAroundMouseDownPoint = true;
+		_viewport->IsTopBottomViewOrientedToFrontBack = true;
+		_viewport->IsViewCubeEdgeClicksEnabled = true;
+		_viewport->Children->Add(gcnew SunLight());
+
+		_viewport->Children->Add(_modelVisual);
+		_viewport->MouseMove += gcnew MouseEventHandler(this, &MainWnd::OnViewportMouseMove);
+
 		_modelVisual->Content = _modelGroup;
 	}
 
@@ -112,7 +131,7 @@ namespace FBStoreA
 		_fbxLoader = nullptr;
 
 		/////////////_modelVisual->Clear()
-		_modelGroup = nullptr;
+		//_modelGroup = nullptr;
 
 	}
 
@@ -127,7 +146,7 @@ namespace FBStoreA
 		binding->Source = this;
 		menuItem->SetBinding(MenuItem::HeaderProperty, binding);
 	}
-
+#ifdef FBXSDK_SHARED
 	void MainWnd::BuildMeshes(FbxNode* node)
 	{
 		if (!node)
@@ -138,10 +157,10 @@ namespace FBStoreA
 			FbxGeometry* geometry = node->GetSrcObject<FbxGeometry>(i);
 			if (geometry && geometry->GetAttributeType() == FbxNodeAttribute::eMesh)
 			{
-				auto greenMt = MaterialHelper::CreateMaterial(Colors::Green);
-
 				FbxMesh* mesh = geometry->GetNode()->GetMesh();
 				auto meshBuilder = gcnew MeshBuilder(false, false, false);
+
+				auto greenMt = MaterialHelper::CreateMaterial(Colors::Green);
 
 				FbxLayer* layer = mesh->GetLayer(0);
 				FbxLayerElementMaterial* pMaterialLayer = layer->GetMaterials();
@@ -152,8 +171,8 @@ namespace FBStoreA
 					FbxSurfaceMaterial* smat = mesh->GetNode()->GetMaterial(matIndex);
 					if (smat->GetClassId().Is(FbxSurfaceLambert::ClassId))
 					{
-						FbxSurfaceLambert* lam = (FbxSurfaceLambert*)smat;
-						FbxPropertyT<FbxDouble3> p = lam->Emissive;//Diffuse
+						FbxSurfaceLambert* surf = (FbxSurfaceLambert*)smat;
+						FbxPropertyT<FbxDouble3> p = surf->Emissive;
 						FbxDouble3 color = p.Get();
 						greenMt = MaterialHelper::CreateMaterial(Color::FromRgb((uchar)(255 * color[0]), (uchar)(255 * color[1]), (uchar)(255 * color[2])));
 						break;
@@ -174,13 +193,77 @@ namespace FBStoreA
 					}
 					meshBuilder->AddPolygon(points);
 				}
-				_modelGroup->Children->Add(
-					gcnew GeometryModel3D(ConverterExtensions::ToWndMeshGeometry3D(meshBuilder->ToMesh(), true), greenMt));
+				auto gm = gcnew GeometryModel3D(ConverterExtensions::ToWndMeshGeometry3D(meshBuilder->ToMesh(), true), greenMt);
+				try
+				{
+					const auto& tr = node->LclTranslation.Get();
+					const auto& rt = node->LclRotation.Get();
+					const auto& sc = node->LclScaling.Get();
+					
+					FbxAMatrix trM;
+					trM.SetS(tr);
+					FbxAMatrix rtM;
+					rtM.SetS(rt);
+					FbxAMatrix scM;
+					scM.SetS(sc);
+					FbxAMatrix all = trM * rtM * scM;
+					
+					auto m = gcnew Matrix3D();
+					m->M11 = all[0][0];
+					m->M12 = all[0][1];
+					m->M13 = all[0][2];
+					m->M14 = all[0][3];
+					m->M21 = all[1][0];
+					m->M22 = all[1][1];
+					m->M23 = all[1][2];
+					m->M24 = all[1][3];
+					m->M31 = all[2][0];
+					m->M32 = all[2][1];
+					m->M33 = all[2][2];
+					m->M34 = all[2][3];
+					m->M44 = all[3][3];
+					gm->Transform = gcnew MatrixTransform3D(*m);
+				}
+				catch (...)
+				{
+				}
+
+				_modelGroup->Children->Add(gm);
 			}
 		}
 		for (int i = 0; i < node->GetChildCount(); i++)
 			BuildMeshes(node->GetChild(i));
 	}
+#else
+	void MainWnd::BuildMeshes(ufbx_node* node)
+	{
+		if (!node)
+			return;
+		ufbx_mesh* mesh = node->mesh;
+		if (mesh)
+		{
+			auto meshBuilder = gcnew MeshBuilder(false, false, false);
+			auto greenMt = MaterialHelper::CreateMaterial(Colors::Green);
+								
+			const ufbx_face* faces = mesh->faces.data;
+			for (int j = 0; j < mesh->faces.count; j++)
+			{
+				auto points = gcnew List<Vector3>();
+				const ufbx_face& face = faces[j];
+				for (int k = 0; k < face.num_indices; k++)
+				{
+					ufbx_vec3 vertex = ufbx_get_vertex_vec3(&mesh->vertex_position, face.index_begin + k);
+					points->Add(Vector3((float)vertex.x, (float)vertex.y, (float)vertex.z));
+				}
+				meshBuilder->AddPolygon(points);
+			}
+			auto gm = gcnew GeometryModel3D(ConverterExtensions::ToWndMeshGeometry3D(meshBuilder->ToMesh(), true), greenMt);
+			_modelGroup->Children->Add(gm);
+		}
+		for (int i = 0; i < node->children.count; i++)
+			BuildMeshes(node->children[i]);
+	}
+#endif
 
 	MainWnd::~MainWnd()
 	{
@@ -197,14 +280,12 @@ namespace FBStoreA
 
 			string fname = ConvertToStdString(dlg->FileName);
 			_fbxLoader->importFile(fname.c_str());
-
+	
+#ifdef FBXSDK_SHARED
 			BuildMeshes((FbxNode*)(_fbxLoader->_scene));
-
-			// some ad hoc transform FIX ME
-			Vector3D ra = Vector3D(1, 0, 0);
-			AxisAngleRotation3D^ aar = gcnew AxisAngleRotation3D(ra, 90);
-			RotateTransform3D^ rt = gcnew RotateTransform3D(aar);
-			_modelGroup->Transform = rt;
+#else
+			BuildMeshes(_fbxLoader->_scene->root_node);
+#endif
 		}
 	}
 
@@ -212,4 +293,22 @@ namespace FBStoreA
 	{
 	}
 
+	void MainWnd::OnViewportMouseMove(Object^ sender, MouseEventArgs^ e)
+	{
+		if (e->RightButton == MouseButtonState::Pressed
+			|| e->MiddleButton == MouseButtonState::Pressed)
+		{
+			auto cam = _viewport->Camera;
+			Matrix3D viewMx = CameraHelper::GetViewMatrix(cam);
+			Matrix3D projMx = CameraHelper::GetProjectionMatrix(cam, _viewport->ActualWidth / _viewport->ActualHeight);
+			Matrix3D viewProjMx = viewMx * projMx;
+			String^ str = String::Format(
+				"{0:F2},{1:F2},{2:F2},{3:F2},{4:F2},{5:F2},{6:F2},{7:F2},{8:F2},{9:F2},{10:F2},{11:F2},{12:F2}",
+				viewProjMx.M11, viewProjMx.M12, viewProjMx.M13, viewProjMx.M14,
+				viewProjMx.M21, viewProjMx.M22, viewProjMx.M23, viewProjMx.M24,
+				viewProjMx.M31, viewProjMx.M32, viewProjMx.M33, viewProjMx.M34,
+				viewProjMx.M44);
+			_transform_sb_tb->Text = str;
+		}
+	}
 }

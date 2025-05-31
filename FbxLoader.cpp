@@ -1,4 +1,9 @@
+#pragma unmanaged
+
+#ifdef FBXSDK_SHARED
+
 #include <fbxsdk.h>
+#include <fbxsdk/core/math/fbxaffinematrix.h>
 
 #include "FbxLoader.h"
 
@@ -67,4 +72,44 @@ namespace FBStoreA
 		}
 		return true;
 	}
+
 }
+#else
+
+#include "ufbx.h"
+
+#include "FbxLoader.h"
+
+#include <cstring>
+#include <iostream>
+
+using namespace std;
+
+namespace FBStoreA
+{
+	FbxLoader::~FbxLoader()
+	{
+		if (_scene)
+			ufbx_free_scene(_scene);
+	}
+
+	bool FbxLoader::importFile(const char* fileName)
+	{
+		ufbx_load_opts opts;
+		std::memset(&opts, 0, sizeof(opts));
+		opts.target_axes = ufbx_axes_right_handed_y_up;
+		opts.target_unit_meters = 1.0f;
+
+		ufbx_error error;
+		ufbx_scene* scene = ufbx_load_file(fileName, &opts, &error);
+		if (!scene) 
+		{
+			cout << "FBX scene load file failed! " << error.description.data << endl;
+			return false;
+		}
+		_scene = scene;
+		return true;
+	}
+
+}
+#endif

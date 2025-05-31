@@ -17,6 +17,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <Menu Grid.Column="0">
             <MenuItem Header="_File" x:Name="MenuItem_File">
@@ -31,18 +32,15 @@
         <Menu Grid.Column="2">
             <MenuItem x:Name="MenuItem_User" Header="" />
         </Menu>
+        
+        <Grid x:Name="Grid_Viewport"
+                Grid.Row="1" 
+                Grid.ColumnSpan="3"/>
 
-        <h:HelixViewport3D  x:Name="Viewport"
-                            Grid.Row="1" 
-                            Grid.ColumnSpan="3"
-                            ShowFrameRate="True"
-                            ZoomExtentsWhenLoaded="True"
-                            ZoomAroundMouseDownPoint="True"
-                            RotateAroundMouseDownPoint="True"
-                            IsTopBottomViewOrientedToFrontBack="True"
-                            IsViewCubeEdgeClicksEnabled="True">
-            <h:SunLight />
-        </h:HelixViewport3D>
-
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="3">
+            <StatusBarItem>
+                <TextBlock x:Name="TextBlock_Transform" />
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>
